@@ -1,0 +1,219 @@
+/* Estilos existentes */
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.weekday {
+  font-weight: bold;
+  text-align: center;
+  padding: 10px;
+  background-color: #b3e5fc;
+  border-bottom: 1px solid #ffff;
+  color: #fff;
+  border-radius: 5px;
+}
+
+.day {
+  border: 1px solid #fff;
+  padding: 10px;
+  text-align: center;
+  background-color: #b3e5fc;
+  transition: background-color 0.3s;
+  flex: 1 0 auto; /* Asegura que las cuadrículas tengan el mismo tamaño */
+}
+
+/* Nuevos estilos */
+.calendar-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+
+}
+
+.calendar-header {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.month-selector {
+  display: flex;
+  align-items: center;
+  background-color: white;
+  color: #b3e5fc;
+  padding: 10px;
+  border-radius: 5px;
+  padding: 5px 10px;
+}
+
+.day:hover {
+  background-color: #e6f7ff;
+}
+
+.event {
+  background-color: #fff;
+  color: #b3e5fc;
+  padding: 5px;
+  margin-top: 5px;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  cursor: pointer; /* Hace que los eventos se vean como botones */
+  transition: background-color 0.3s; /* Agrega una transición suave al cambio de color */
+}
+
+.event:hover {
+  background-color: #b3e5fc; /* Cambia el color de fondo al pasar el mouse */
+  color: white;
+}
+.event-details {
+  width: 100%;
+  max-width: 400px;
+  margin-top: 20px;
+  padding: 20px;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  color:  #b3e5fc;
+}
+
+.app-title {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 3em; /* Increase the font size */
+  font-weight: bold;
+  text-shadow: 0px 0px 0px rgba(0, 0, 0, 1); /* Keep the shadow */
+}
+
+body {
+  font-family: Arial, sans-serif; /* Use Arial as the font */
+  background-color: #b3e5fc;
+  color:  white; 
+}
+
+.mes {
+  font-size: 2em; /* Increase the font size */
+  font-weight: bold; /* Make the font bold */
+  text-shadow: 0px 0px 0px rgba(0, 0, 0, 1); /* Keep the shadow */
+  margin: 0 20px;
+}
+
+
+
+
+  /* Estilos para el modal */
+  .modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #b3e5fc;
+  }
+
+  .modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 500px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .close:hover,
+  .close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  /* Estilos para el formulario dentro del modal */
+  .modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .modal-content input,
+  .modal-content textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+
+  .modal-content textarea {
+    height: 100px;
+    resize: vertical;
+  }
+
+  .modal-content button {
+    padding: 8px 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .modal-content button:hover {
+    background-color: #45a049;
+  }
+
+  .modal-content button[type="button"] {
+    background-color: #f44336;
+  }
+
+  .modal-content button[type="button"]:hover {
+    background-color: #d32f2f;
+  }
+
+  /* Estilos para la lista de eventos en el modal */
+  .modal-content h2 {
+    margin-bottom: 15px;
+  }
+
+  .modal-content h3 {
+    margin-bottom: 5px;
+  }
+
+  .modal-content p {
+    margin-bottom: 10px;
+  }
+
+  .modal-content div > button {
+    margin-right: 10px;
+    margin-bottom: 10px;
+  }
+
+  /* Ajustes para el botón de agregar evento */
+  .modal-content button.add-event {
+    margin-top: 15px;
+    background-color: #2196F3;
+  }
+
+  .modal-content button.add-event:hover {
+    background-color: #1976D2;
+  }
