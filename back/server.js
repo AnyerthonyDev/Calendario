@@ -220,4 +220,42 @@ app.get('/consultorios', async (req, res) => {
   }
 });
 
+//inicio de sesion y manejo de tockens
+app.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    const pool = await poolPromise;
+    const result = await pool.request()
+      .input('email', sql.VarChar, email)
+      .input('password', sql.VarChar, password)
+      .query('SELECT * FROM USUARIOS WHERE email = @email AND password = @password'); // Nombre de la vista
 
+    if (result.recordset.length > 0) {
+      const user = result.recordset[0];
+      const token = jwt.sign({ id: user.id }, 'secret', { expiresIn: '1h' });
+      res.json({ token });
+    } else {
+      res.status(401).send('Invalid email or password');
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error: ' + err);
+  }
+});
+
+//funcion verify token para proteger las rutas
+function verifyToken(req, res, next) {
+  const token = req.headers.authorization;
+  if (!token) {
+    return res.status(401).send('Unauthorized');
+  }
+  try {
+    const decoded = jwt.verify(token, 'secret');
+    req.user = decoded;
+    next();
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error: ' + err);
+  }
+}
