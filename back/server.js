@@ -10,6 +10,8 @@ app.use(cors({origin: process.env.FRONT_SERVER}))
 app.use(express.json());
 
 
+
+
 // Endpoint para obtener eventos en un rango de fechas
 app.get('/events/range', async (req, res) => {
   try {
@@ -74,7 +76,7 @@ app.get('/medicos/all', async (req, res) => {
   try {
     const pool = await poolPromise;
     const result = await pool.request()
-      .query("SELECT id,nombre + ' ' + ISNULL(apellido,'') nombre  FROM OWNER_QUEUE"); // Nombre de la vista
+      .query("SELECT A.id,nombre + ' ' + ISNULL(apellido,'') nombre  FROM OWNER_QUEUE A INNER JOIN OWNER_QUEUE_ESPECIALIDADES B ON A.id=B.id_owner_queue WHERE B.id_especialidad = 158"); // Nombre de la vista
     const respuesta = {resultados: result.recordset };
     res.json(respuesta);
   } catch (err) {
@@ -109,7 +111,7 @@ app.post('/events/moveEvent', async (req, res) => {
       .input('NewDate', sql.Date, date)
       .output('status', sql.Int)
       .output('resultado', sql.VarChar)
-      .execute('MoveEvent'); // Name of the stored procedure to update the event date
+      .execute('usp_Calendario_MoveEvent'); // Name of the stored procedure to update the event date
 
     const status = result.output.status;
     const response = result.output.resultado;
@@ -132,7 +134,7 @@ app.post('/events/addEvent', async (req, res) => {
       .input('fecha', sql.Date, date)
       .output('status', sql.Int)
       .output('resultado', sql.VarChar)
-      .execute('addEvent'); // Name of the stored procedure to update the event date
+      .execute('usp_Calendario_AddEvent'); // Name of the stored procedure to update the event date
 
     const status = result.output.status;
     const response = result.output.resultado;
@@ -156,7 +158,7 @@ app.post('/events/editEvent', async (req, res) => {
       .input('fecha', sql.Date, date)
       .output('status', sql.Int)
       .output('resultado', sql.VarChar)
-      .execute('editEvent'); // Name of the stored procedure to update the event date
+      .execute('usp_Calendario_EditEvent'); // Name of the stored procedure to update the event date
 
     const status = result.output.status;
     const response = result.output.resultado;
@@ -182,8 +184,6 @@ app.listen(1234, () => {
 });
 
 
-
-
 app.post('/events/deleteEvent', async (req, res) => {
   try {
     const {id} = req.body;
@@ -193,7 +193,7 @@ app.post('/events/deleteEvent', async (req, res) => {
       .input('ID', sql.Int, id)
       .output('status', sql.Int)
       .output('resultado', sql.VarChar)
-      .execute('deleteEvent'); // Name of the stored procedure to update the event date
+      .execute('usp_Calendario_DeleteEvent'); // Name of the stored procedure to update the event date
 
     const status = result.output.status;
     const response = result.output.resultado;
@@ -204,3 +204,20 @@ app.post('/events/deleteEvent', async (req, res) => {
     res.status(500).send('Error: ' + err);
   }
 });
+
+
+//Endpoint para tener todos los consultorios
+app.get('/consultorios', async (req, res) => {
+  try {
+    const pool = await poolPromise;
+    const result = await pool.request()
+      .query('SELECT * FROM CONSULTORIOS'); // Nombre de la vista
+    const respuesta = {resultados: result.recordset };
+    res.json(respuesta);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error: ' + err);
+  }
+});
+
+

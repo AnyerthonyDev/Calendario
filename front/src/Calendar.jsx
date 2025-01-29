@@ -44,6 +44,7 @@ const Calendar = () => {
               eventsByDay[day] = [];
             }
             eventsByDay[day].push(event);
+
           }
         });
 
@@ -132,9 +133,13 @@ const Calendar = () => {
       item: { id: event.id },
     }));
 
+    
+
     return (
-      <div ref={drag} className="event">
+      <div ref={drag} className="event" style={{backgroundColor:event.color}} onClick={() => handleEditEvent(event,false) }>
         {event.nombre_medico}
+        <br />
+        Turno: {event.turno_turno}
       </div>
     );
   };
@@ -153,10 +158,11 @@ const Calendar = () => {
     );
   };
 
-const handleEditEvent = (event) => {
+const handleEditEvent = (event,muestraModal) => {
   setEventForm({ nombre: event.nombre, turno: event.turno });
   setEditingEventId(event.id);
   setCurrentAction('edit');
+  setIsModalOpen(muestraModal)
 };
 
 const handleDeleteEvent = async (eventId) => {
@@ -207,6 +213,7 @@ const handleSubmitEvent = async (e) => {
       //useEffect();
       recargar(!recarga)
     }
+    setIsModalOpen(false)
     setCurrentAction('view');
     setEventForm({ nombre: 0, turno: 0 });
     setEditingEventId(null);
@@ -220,9 +227,9 @@ const handleSubmitEvent = async (e) => {
       <div className="calendar-container">
         <div className="calendar-header">
           <div className="month-selector">
-            <button onClick={() => changeMonth(-1)}></button>
+            <button onClick={() => changeMonth(-1)} className='month-change'></button>
             <span className='mes'>{months[currentMonth]} {currentYear}</span>
-            <button onClick={() => changeMonth(1)}></button>
+            <button onClick={() => changeMonth(1)} className='month-change'></button>
           </div>
         </div>
         <div className="calendar">
@@ -248,15 +255,15 @@ const handleSubmitEvent = async (e) => {
                   setCurrentAction('view');
                   setEventForm({ nombre: 0, turno: 0 });
                 }}>×</span>
-                <h2>Guardias del día {selectedDay}</h2>
+                <h2 className='headerModal'>Guardias del día {selectedDay}</h2>
                 {currentAction === 'view' && (
                   <>
                     {(events[selectedDay] || []).map(event => (
-                      <div key={event.id}>
+                      <div key={event.id} className='enventDetails'>
                         <h3>{event.nombre_medico}</h3>
                         <p>{event.turno_turno}</p>
-                        <button onClick={() => handleEditEvent(event)}>Editar</button>
-                        <button onClick={() => handleDeleteEvent(event.id)}>Eliminar</button>
+                        <button onClick={() => handleEditEvent(event,true)}>Editar</button>
+                        <button onClick={() => handleDeleteEvent(event.id)} type='button'>Eliminar</button>
                       </div>
                     ))}
                     <button className="add-event" onClick={() => setCurrentAction('add')}>Agregar Evento</button>
@@ -283,7 +290,8 @@ const handleSubmitEvent = async (e) => {
                     </button>
                     <button type="button" onClick={() => {
                       setCurrentAction('view');
-                      setEventForm({ nombre: '', turno: '' });
+                      setIsModalOpen(false)
+                      setEventForm({ nombre: 0, turno: 0 });
                     }}>Cancelar</button>
                   </form>
                 )}
