@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken'); // Add this line
 require('dotenv').config();
 
 const { sql, poolPromise } = require('./dataBase');
@@ -9,8 +10,26 @@ app.use(cors({origin: process.env.FRONT_SERVER}))
 
 app.use(express.json());
 
+//funcion verify token para proteger las rutas
+function verifyToken(req, res, next) {
+  const token = req.headers.authorization;
+  if (!token) {
+    return res.status(401).send('Unauthorized');
+  }
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error: ' + err);
+  }
+}
 
-
+// Apply verifyToken middleware to all routes except /login
+app.use('/events', verifyToken);
+app.use('/medicos', verifyToken);
+app.use('/turnos', verifyToken);
 
 // Endpoint para obtener eventos en un rango de fechas
 app.get('/events/range', async (req, res) => {
@@ -206,56 +225,31 @@ app.post('/events/deleteEvent', async (req, res) => {
 });
 
 
-//Endpoint para tener todos los consultorios
-app.get('/consultorios', async (req, res) => {
-  try {
-    const pool = await poolPromise;
-    const result = await pool.request()
-      .query('SELECT * FROM CONSULTORIOS'); // Nombre de la vista
-    const respuesta = {resultados: result.recordset };
-    res.json(respuesta);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Error: ' + err);
-  }
-});
 
 //inicio de sesion y manejo de tockens
 app.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    
     const pool = await poolPromise;
     const result = await pool.request()
       .input('email', sql.VarChar, email)
       .input('password', sql.VarChar, password)
-      .query('SELECT * FROM USUARIOS WHERE email = @email AND password = @password'); // Nombre de la vista
+      .output('status', sql.Int)
+      .output('resultado', sql.VarChar)
+      .execute('usp_Calendario_Login'); // Nombre del stored procedure
 
-    if (result.recordset.length > 0) {
+    const status = result.output.status;
+    const response = result.output.resultado;
+
+    if (status === 1 && result.recordset.length > 0) {
       const user = result.recordset[0];
-      const token = jwt.sign({ id: user.id }, 'secret', { expiresIn: '1h' });
-      res.json({ token });
+      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+      res.json({ status, token });
     } else {
-      res.status(401).send('Invalid email or password');
+      res.json({ status, resultado: response });
     }
   } catch (err) {
     console.error(err);
     res.status(500).send('Error: ' + err);
   }
 });
-
-//funcion verify token para proteger las rutas
-function verifyToken(req, res, next) {
-  const token = req.headers.authorization;
-  if (!token) {
-    return res.status(401).send('Unauthorized');
-  }
-  try {
-    const decoded = jwt.verify(token, 'secret');
-    req.user = decoded;
-    next();
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Error: ' + err);
-  }
-}

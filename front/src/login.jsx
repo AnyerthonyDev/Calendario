@@ -1,7 +1,9 @@
 //toda la estrucctura del login con sus clases para darle estilos en el css
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+
 import './login.css'; // Asegúrate de importar el CSS
+import axios from 'axios';
+import config from '../config'; // Import the config file for the API URL
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -15,11 +17,22 @@ const Login = () => {
         setPassword(e.target.value);
     };
 
-    const handleSubmit = (e) => {    
+    const handleSubmit = async (e) => {    
         e.preventDefault();
-        // Inicio de sesion y manejo de tockens
-        
-
+        try {
+            const response = await axios.post(`${config.apiUrl}/login`, { email, password });
+            if (response.data.status === 1 && response.data.token) {
+                // Save the token in localStorage or state
+                localStorage.setItem('token', response.data.token);
+                // Redirect to the calendar page or another page
+                window.location.href = '/calendar';
+            } else {
+                alert(response.data.resultado);
+            }
+        } catch (error) {
+            console.error('Error logging in:', error);
+            alert('Error al iniciar sesión');
+        }
     };
 
     return (
